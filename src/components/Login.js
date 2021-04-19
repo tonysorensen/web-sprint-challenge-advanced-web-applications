@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { axiosWithAuth } from "../api/axiosWithAuth";
+import { axiosWithAuth } from "../helpers/axiosWithAuth";
 
 const Login = (props) => {
   const [state, setState] = useState({
@@ -8,24 +8,38 @@ const Login = (props) => {
       password: "",
     },
   });
+  const [error, setError] =useState(""
+  )
+  //replace with error state
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
-
-  useEffect((e)=>{
-    // make a post request to retrieve a token from the api
-    // when you have handled the token, navigate to the BubblePage route
+  const handleSubmit= (e) => {
     e.preventDefault();
     axiosWithAuth()
-      .post("http://localhost:5000/api/login", state.credentials)
-      .then((res) => {
-        localStorage.setItem("token", res.data.payload);
-        props.history.push("/protected");
-      })
-      .catch((err) => {
-        console.log("There was an error", err);
-      });
-  } 
-  );
+    .post("http://localhost:5000/api/login", state.credentials)
+    .then((res) => {
+      localStorage.setItem("token", res.data.payload);
+      props.history.push("/protected");
+     
+    })
+    .catch((err) => {
+      console.log("There was an error", err);
+      console.log(err.response.data.error)
+      if (err.response.status === 403){
+         setError(
+          err.response.data.error
+         )
+      }
+
+    });
+  }
+ 
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token")
+  //   // make a post request to retrieve a token from the api
+  //   // when you have handled the token, navigate to the BubblePage route
+  // console.log('token', token) 
+  // });
 
   const handleChange = (e) => {
     setState({
@@ -36,26 +50,22 @@ const Login = (props) => {
     });
   };
 
-  
-    
-  const error = "";
-  //replace with error state
+ 
 
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
       <div data-testid="loginForm" className="login-form">
-        <h2>Build login form here</h2>
-        <form  className="loginForm">
+        <form onSubmit = {handleSubmit} className="loginForm">
           <input
-          data-testid="username"
+            data-testid="username"
             type="text"
             name="username"
             value={state.credentials.username}
             onChange={handleChange}
           />
           <input
-          data-testid="password"
+            data-testid="password"
             type="password"
             name="password"
             value={state.credentials.password}
@@ -65,7 +75,9 @@ const Login = (props) => {
         </form>
       </div>
 
-      <p data-testid="errorMessage" className="error">{error}</p>
+      <p data-testid="errorMessage" className="error">
+        {error}
+      </p>
     </div>
   );
 };

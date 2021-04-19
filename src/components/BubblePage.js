@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-
+import { axiosWithAuth } from "../helpers/axiosWithAuth";
 import Bubbles from "./Bubbles";
 import ColorList from "./ColorList";
 
 const BubblePage = () => {
   const [colorList, setColorList] = useState([]);
+  useEffect(() => {
+    axiosWithAuth()
+      .get("http://localhost:5000/api/colors")
+      .then((res) => {
+        setColorList(res.data);
+        console.log("get res from BubblePage", res.data);
+      })
+      .catch((err) => console.log(err.response));
+  }, []);
 
   return (
     <div className="container">
