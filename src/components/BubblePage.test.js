@@ -1,13 +1,21 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import BubblePage from "./BubblePage";
 
 test("Renders BubblePage without errors", () => {
   // Finish this test
+  render(<BubblePage />);
 });
 
-test("Fetches data and renders the bubbles on mounting", () => {
+test("Fetches data and renders the bubbles on mounting", async () => {
   // Finish this test
+  //sanity checked with expect(bubbles).toBeUndefined();
+  // title of "bubbles" was set on SVG component in Bubbles.js
+  render(<BubblePage />);
+  const bubbles = screen.getByTitle(/bubbles/i);
+  await waitFor(() => {
+    expect(bubbles).toBeDefined();
+  });
 });
 
 //Task List

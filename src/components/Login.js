@@ -1,25 +1,83 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { axiosWithAuth } from "../helpers/axiosWithAuth";
 
-const Login = () => {
+const Login = (props) => {
+  const [state, setState] = useState({
+    credentials: {
+      username: "",
+      password: "",
+    },
+  });
+  const [error, setError] =useState(""
+  )
+  //replace with error state
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
+  const handleSubmit= (e) => {
+    e.preventDefault();
+    axiosWithAuth()
+    .post("http://localhost:5000/api/login", state.credentials)
+    .then((res) => {
+      localStorage.setItem("token", res.data.payload);
+      props.history.push("/protected");
+     
+    })
+    .catch((err) => {
+      console.log("There was an error", err);
+      console.log(err.response.data.error)
+      if (err.response.status === 403){
+         setError(
+          err.response.data.error
+         )
+      }
 
-  useEffect(()=>{
-    // make a post request to retrieve a token from the api
-    // when you have handled the token, navigate to the BubblePage route
-  });
-  
-  const error = "";
-  //replace with error state
+    });
+  }
+ 
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token")
+  //   // make a post request to retrieve a token from the api
+  //   // when you have handled the token, navigate to the BubblePage route
+  // console.log('token', token) 
+  // });
+
+  const handleChange = (e) => {
+    setState({
+      credentials: {
+        ...state.credentials,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
+
+ 
 
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
       <div data-testid="loginForm" className="login-form">
-        <h2>Build login form here</h2>
+        <form onSubmit = {handleSubmit} className="loginForm">
+          <input
+            data-testid="username"
+            type="text"
+            name="username"
+            value={state.credentials.username}
+            onChange={handleChange}
+          />
+          <input
+            data-testid="password"
+            type="password"
+            name="password"
+            value={state.credentials.password}
+            onChange={handleChange}
+          />
+          <button className="loginButton">Log in</button>
+        </form>
       </div>
 
-      <p data-testid="errorMessage" className="error">{error}</p>
+      <p data-testid="errorMessage" className="error">
+        {error}
+      </p>
     </div>
   );
 };
